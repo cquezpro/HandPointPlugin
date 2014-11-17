@@ -5,12 +5,11 @@
     id="com.cordova.handpointplugin"
     version="0.1.0">
 
-    <name>Bluetooth Serial</name>
-    <description>Bluetooth Serial Communication Plugin</description>
+    <name>HandPoint Android Plugin</name>
+    <description>HandPoint Android Plugin</description>
     <license>Apache 2.0</license>
-    <keywords>bluetooth, BLE, arduino</keywords>
-    <repo>https://github.com/don/BluetoothSerial.git</repo>
-    <issue>https://github.com/don/BluetoothSerial/issues</issue>
+    <keywords>handpoint, BLE, arduino</keywords>
+
 
     <engines>
         <engine name="cordova" version=">=2.9.0" />
