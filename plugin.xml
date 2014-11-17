@@ -28,7 +28,7 @@
         </config-file>
 
         <source-file src="src/android/com/cordova/HandPointPlugin.java"
-            target-dir="src/com/megster/cordova"/>
+            target-dir="src/com/cordova/handpointplugin"/>
 
 		<source-file src="src/android/libs/hapi-android-3.2.5.jar"
                 target-dir="libs" />
