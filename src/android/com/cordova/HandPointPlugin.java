@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.cordova.*; // Cordova 3.x
+import org.apache.cordova.CordovaArgs;
+import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.PluginResult;
+import org.apache.cordova.LOG;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -110,6 +116,8 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
     	Device device = new Device(name, address, port, method);
 
     	api.useDevice(device);
+    	
+    	callbackContext.success();
     }
     
     public void disconnect() throws JSONException {
@@ -129,7 +137,12 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
         }
     }
 
-    public boolean pay(String price, String currency){
+    public boolean pay(JSONArray args, CallbackContext callbackContext) throws JSONException{
+    	String price;
+    	String currency;
+    	price = args.getString(0);
+    	currency = args.getString(1);
+    	
     	Currency _currency;
     	_currency = Currency.GBP;
     	if(currency == "GBP") {
@@ -177,6 +190,14 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
     	if(currency == "JPY") {
     		_currency = Currency.JPY;
     	}
+    	
+    	boolean bReturn =  this.api.sale(new BigInteger(price), _currency);
+    	if(bReturn == true ){
+    		callbackContext.success("success");
+    	}else{
+    		callbackContext.error("fail");
+    	}
+    	
         return this.api.sale(new BigInteger(price), _currency);
     }
 
