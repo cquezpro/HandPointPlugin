@@ -34,7 +34,12 @@
 		<!-- kludge for 2.9 -->
         <source-file src="src/android/org/apache/cordova/api/Dummy.java"
             target-dir="src/org/apache/cordova/api"/>
-			
+
+		<source-file src="src/android/libs/hapi-android-3.2.5.jar"
+                target-dir="libs" />
+        <source-file src="src/android/libs/hapi-android-3.2.5-javadoc.jar"
+                target-dir="libs" />
+				
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.BLUETOOTH" />
             <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -46,5 +51,5 @@
       <engine name="cordova" version=">=3.0.0" />
     </engines>
 
-    <dependency id="com.megster.cordova.bluetoothserial " />
+    <!--<dependency id="com.megster.cordova.bluetoothserial " />-->
 </plugin>
