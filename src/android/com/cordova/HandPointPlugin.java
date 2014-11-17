@@ -41,6 +41,12 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
         initApi(context);
     }*/
     
+    public HandPointPlugin() {
+    	super();
+        //Context context = this.cordova.getActivity().getApplicationContext();
+        //initApi(context);        
+    }
+    
     public HandPointPlugin(Context context){
         initApi(context);
     }
@@ -50,6 +56,9 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
     	 LOG.d(TAG, "action = " + action);
     	 
+    	 Context context = this.cordova.getActivity().getApplicationContext();
+         initApi(context); 
+         
     	 this.callbackContext = callbackContext;
          
          boolean retValue = true;
@@ -59,7 +68,7 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
         	 retValue = true;
          } else if (action.equals("pay")) {
         	 //Pay
-        	 
+        	 pay(args, callbackContext);
         	 retValue = true;
          } else if (action.equals("connect")) {
              //Connect Device
@@ -84,10 +93,11 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
     }
     
     public void connect(JSONArray args, CallbackContext callbackContext) throws JSONException {
-    	String name = args.getString(0);
-    	String address = args.getString(1);
-    	String port = args.getString(2);
-    	String connectionMethod = args.getString(3);
+    	JSONObject obj = args.optJSONObject(0);
+    	String name = obj.optString("name");
+        String address = obj.optString("address");
+    	String port = obj.optString("port");
+    	String connectionMethod = obj.optString("method");
     	ConnectionMethod method;
     	
     	method = ConnectionMethod.BLUETOOTH;
@@ -140,8 +150,10 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
     public boolean pay(JSONArray args, CallbackContext callbackContext) throws JSONException{
     	String price;
     	String currency;
-    	price = args.getString(0);
-    	currency = args.getString(1);
+    	JSONObject obj = args.optJSONObject(0);
+    	
+    	price = obj.optString("price");
+        currency = obj.optString("currency");
     	
     	Currency _currency;
     	_currency = Currency.GBP;
