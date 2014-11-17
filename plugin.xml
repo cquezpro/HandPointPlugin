@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin
+    xmlns="http://www.phonegap.com/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="com.cordova.handpointplugin"
+    version="0.1.0">
+
+    <name>Bluetooth Serial</name>
+    <description>Bluetooth Serial Communication Plugin</description>
+    <license>Apache 2.0</license>
+    <keywords>bluetooth, BLE, arduino</keywords>
+    <repo>https://github.com/don/BluetoothSerial.git</repo>
+    <issue>https://github.com/don/BluetoothSerial/issues</issue>
+
+    <engines>
+        <engine name="cordova" version=">=2.9.0" />
+    </engines>
+
+    <js-module src="www/handpoint.js" name="HandPointPlugin">
+        <clobbers target="HandPointPlugin" />
+    </js-module>
+
+    <platform name="android">
+
+        <config-file target="res/xml/config.xml" parent="/widget">
+            <feature name="HandPointPlugin">
+                <param name="android-package" value="com.cordova.handpointplugin"/>
+            </feature>
+        </config-file>
+
+        <source-file src="src/android/com/cordova/HandPointPlugin.java"
+            target-dir="src/com/megster/cordova"/>
+
+		<!-- kludge for 2.9 -->
+        <source-file src="src/android/org/apache/cordova/api/Dummy.java"
+            target-dir="src/org/apache/cordova/api"/>
+			
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.BLUETOOTH" />
+            <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+        </config-file>
+
+    </platform>
+
+    <engines>
+      <engine name="cordova" version=">=3.0.0" />
+    </engines>
+
+    <dependency id="com.megster.cordova.bluetoothserial " />
+</plugin>
