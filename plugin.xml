@@ -49,6 +49,4 @@
     <engines>
       <engine name="cordova" version=">=3.0.0" />
     </engines>
-
-    <!--<dependency id="com.megster.cordova.bluetoothserial " />-->
 </plugin>
