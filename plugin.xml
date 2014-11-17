@@ -16,14 +16,14 @@
     </engines>
 
     <js-module src="www/handpoint.js" name="HandPointPlugin">
-        <clobbers target="HandPointPlugin" />
+        <clobbers target="com.cordova.handpointplugin" />
     </js-module>
 
     <platform name="android">
 
         <config-file target="res/xml/config.xml" parent="/widget">
             <feature name="HandPointPlugin">
-                <param name="android-package" value="com.cordova.handpointplugin"/>
+                <param name="android-package" value="com.cordova.handpointplugin.HandPointPlugin"/>
             </feature>
         </config-file>
 
