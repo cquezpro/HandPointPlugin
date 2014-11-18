@@ -6,11 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.cordova.*; // Cordova 3.x
-import org.apache.cordova.CordovaArgs;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.PluginResult;
-import org.apache.cordova.LOG;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,6 +24,7 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
     Device device;
     @SuppressWarnings("unused")
 	private CallbackContext callbackContext;
+    private CallbackContext List_callbackContext;
     
     // Debugging
     private static final String TAG = "HandPoint";
@@ -37,60 +33,137 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
     private String[] ConnectioMethod = {"USB", "SERIAL", "BLUETOOTH", "HTTPS", "WIFI", "ETHERNET", "SIMULATOR"};
     
 
-    /*public HandPointPlugin(Context context){
-        initApi(context);
-    }*/
+    //Receiving a list of connectable devices
+    List<Device> myListOfDevices;
+    
+    private String sharedSecret_key;
+    private String deviceName;
+    private Context appContext;
+    private boolean done;
     
     public HandPointPlugin() {
     	super();
-        //Context context = this.cordova.getActivity().getApplicationContext();
-        //initApi(context);        
+    	sharedSecret_key = "0102030405060708091011121314151617181920212223242526272829303132"; //this is test key.
+    	deviceName = "test";
     }
     
     public HandPointPlugin(Context context){
-        initApi(context);
+        //initApi(context);
     }
-
     
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
     	 LOG.d(TAG, "action = " + action);
     	 
-    	 Context context = this.cordova.getActivity().getApplicationContext();
-         initApi(context); 
+    	 appContext = this.cordova.getActivity().getApplicationContext();
          
     	 this.callbackContext = callbackContext;
          
          boolean retValue = true;
          if (action.equals("init")) {
              //Initialize  API
-        	 
+        	 initApi(appContext, callbackContext); 
         	 retValue = true;
+        	 
          } else if (action.equals("pay")) {
         	 //Pay
         	 pay(args, callbackContext);
         	 retValue = true;
+        	 
          } else if (action.equals("connect")) {
              //Connect Device
         	 connect(args, callbackContext);
         	 retValue = true;
-         } else {
+        	 
+         } else if (action.equals("connectWithCurrentDevice")) {
+             //Connect Device
+        	 connect(callbackContext);
+        	 retValue = true;
+        	 
+         } else if (action.equals("ListDevices")) {
+             //Connect Device
+        
+			ListDevices(callbackContext);
+			
+        	 retValue = true;
+        	 
+         } else if (action.equals("SetMerchantKey")) {
+             //Connect Device
+        	 SetMerchantKey(args, callbackContext);
+        	 retValue = true;
+        	 
+         } else if (action.equals("SetDeviceName")) {
+             //Connect Device
+        	 SetDeviceName(args, callbackContext);
+        	 retValue = true;
+        	 
+         }   else {
              retValue = false;
+             
          }
 
          return retValue;
     }
 
-    public void initApi(Context context){
-        String sharedSecret = "0102030405060708091011121314151617181920212223242526272829303132";
-        this.api = HapiFactory.getAsyncInterface(this, context).defaultSharedSecret(sharedSecret);
-
+    public void initApi(Context context, CallbackContext callbackContext){
+      
+        this.api = HapiFactory.getAsyncInterface(this, context).defaultSharedSecret(sharedSecret_key);
+      //Register a listener for required events
+        this.api.addRequiredEventHandler(this);
+        
         //The api is now initialized. Yay! we've even set a default shared secret!
         //But we need to connect to a device to start taking payments.
         //Let's search for them:
         this.api.listDevices(ConnectionMethod.BLUETOOTH);
+        
         //This triggers the search, you should expect the results in the listener defined above
+        callbackContext.success();
     }
+    
+  //You should populate this method as is you see fit.
+  //Here we assume the name of a device and use it.
+  //Connection to the device is handled automatically in the API
+  @Override
+  public void deviceDiscoveryFinished(List<Device> devices){
+
+	  myListOfDevices = devices;
+      for(Device device : devices){
+    	  if(device.getName().equals(deviceName)){
+    		  //We'll remember the device for this session, but is cool that you do too
+              this.device = device;
+              this.api.useDevice(this.device);
+          }
+      }
+      
+      
+      JSONArray deviceList = new JSONArray();
+	  	
+	  	for(Device device : myListOfDevices){
+	  		 JSONObject json = new JSONObject();
+            try {
+				json.put("name", device.getName());
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            try {
+				json.put("address", device.getAddress());
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            try {
+				json.put("port", device.getPort());
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            
+            deviceList.put(json);
+	      }
+  	
+	  	List_callbackContext.success(deviceList);
+  }
     
     public void connect(JSONArray args, CallbackContext callbackContext) throws JSONException {
     	JSONObject obj = args.optJSONObject(0);
@@ -125,7 +198,22 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
     	
     	Device device = new Device(name, address, port, method);
 
-    	api.useDevice(device);
+    	Hapi bFlag = api.useDevice(device);
+    	
+    	callbackContext.success();
+    }
+    
+    
+    public void connect(CallbackContext callbackContext) throws JSONException {
+    	for(Device device : myListOfDevices){
+      	  if(device.getName().equals(deviceName)){
+      		  //We'll remember the device for this session, but is cool that you do too
+                this.device = device;
+                this.api.useDevice(this.device);
+            }
+        }
+
+    	Hapi bFlag = api.useDevice(device);
     	
     	callbackContext.success();
     }
@@ -136,17 +224,6 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
     }
     
     
-    @Override
-    public void deviceDiscoveryFinished(List<Device> devices){
-        for(Device device : devices){
-            if(device.getName().equals("MyDeviceName")){
-                //We'll remember the device for this session, but is cool that you do too
-                this.device = device;
-                this.api.useDevice(this.device);
-            }
-        }
-    }
-
     public boolean pay(JSONArray args, CallbackContext callbackContext) throws JSONException{
     	String price;
     	String currency;
@@ -212,7 +289,32 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
     	
         return this.api.sale(new BigInteger(price), _currency);
     }
+    
+    
+    public void SetMerchantKey(JSONArray args, CallbackContext callbackContext) throws JSONException {
+    	String key;
+    	JSONObject obj = args.optJSONObject(0);
+    	
+    	key = obj.optString("key");
+    	sharedSecret_key = key;
+    }
+    
+    public void SetDeviceName(JSONArray args, CallbackContext callbackContext) throws JSONException {
+    	String name;
+    	JSONObject obj = args.optJSONObject(0);
+    	
+    	name = obj.optString("name");
+    	deviceName = name;
+    }
 
+   
+	public void ListDevices(CallbackContext callbackContext) {
+
+    	List_callbackContext = callbackContext; 
+    	
+    	//callbackContext.success(message);
+    }
+    
     @Override
     public void signatureRequired(SignatureRequest signatureRequest, Device device){
         //You'll be notified here if a sale process needs signature verification
@@ -225,5 +327,5 @@ public class HandPointPlugin extends CordovaPlugin implements Events.Required {
 	            //...
 	        }
     }
-
+    
 }

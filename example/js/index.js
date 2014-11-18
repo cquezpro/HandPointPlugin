@@ -34,14 +34,29 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
     	alert("device Ready");
-    	HandPointPlugin.connect("CardReader7", "08:00:69:02:01:FC", "1", "BLUETOOTH", app.connectSuccess, app.connectFail);
     	
-    	HandPointPlugin.pay("1000","GBP",app.paySuccess, app.payFail);
+    	HandPointPlugin.SetMerchantKey("0102030405060708091011121314151617181920212223242526272829303132");
+    	HandPointPlugin.init();
+    	HandPointPlugin.ListDevices(app.getDeviceList);
     	
         app.receivedEvent('deviceready');
     },
+    getDeviceList : function(deviceList) {
+    	alert("founded device count is " + deviceList.length);
+    	for(i=0;i<deviceList.length;i++) {
+    		alert("name is " + deviceList[i].name);
+    		alert("address is " + deviceList[i].address);
+    		alert("port is " + deviceList[i].port);
+    	}
+    	
+    	HandPointPlugin.SetDeviceName("Windows Phone");
+    	HandPointPlugin.connectWithCurrentDevice(app.connectSuccess, app.connectFail);
+    	//HandPointPlugin.connect("CardReader7", "08:00:69:02:01:FC", "1", "BLUETOOTH", app.connectSuccess, app.connectFail);
+    },
     connectSuccess : function() {
     	alert("connectSuccess");
+    	
+    	HandPointPlugin.pay("1000","GBP",app.paySuccess, app.payFail);
     },
     connectFail : function() {
     	alert("connectFail");
