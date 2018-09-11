@@ -3,7 +3,7 @@
     xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.cordova.handpointplugin"
-    version="0.1.0">
+    version="0.1.10">
 
     <name>HandPoint Android Plugin</name>
     <description>HandPoint Android Plugin</description>
