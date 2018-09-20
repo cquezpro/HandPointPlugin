@@ -1,4 +1,6 @@
 # HandPoint Android Plugin for PhoneGap
 
-Reference site: handpoint.com
+Reference site:
+
+handpoint.com
 
